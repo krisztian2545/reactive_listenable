@@ -19,8 +19,10 @@ abstract class ReactiveListenableObserver {
   /// Creates a new default observer.
   ///
   /// The default implementation of the observer is [DefaultReactiveListenableObserver].
-  static ReactiveListenableObserver createDefaultObserver() =>
-      DefaultReactiveListenableObserver();
+  static ReactiveListenableObserver? createDefaultObserver() {
+    if (kDebugMode) return DefaultReactiveListenableObserver();
+    return null;
+  }
 
   /// Called when a [ReactiveListenable] changes.
   ///
@@ -38,26 +40,22 @@ abstract class ReactiveListenableObserver {
 class DefaultReactiveListenableObserver extends ReactiveListenableObserver {
   @override
   void onChange(Object observedObject) {
-    if (kDebugMode) {
-      switch (observedObject) {
-        case StateNotifier():
-          debugPrint(
-            "[StateNotifier changed] ($observedObject)${observedObject.debugLabel}: ${observedObject.value}",
-          );
-        case Effect():
-          debugPrint(
-            "[Effect run] ($observedObject)${observedObject.debugLabel}",
-          );
-        default:
-          debugPrint("[Object changed] $observedObject");
-      }
+    switch (observedObject) {
+      case StateNotifier():
+        debugPrint(
+          "[StateNotifier changed] ($observedObject)${observedObject.debugLabel}: ${observedObject.value}",
+        );
+      case Effect():
+        debugPrint(
+          "[Effect run] ($observedObject)${observedObject.debugLabel}",
+        );
+      default:
+        debugPrint("[Object changed] $observedObject");
     }
   }
 
   @override
   void onError(Object observedObject, Object error, StackTrace stackTrace) {
-    if (kDebugMode) {
-      debugPrint("[Error] $observedObject: $error\nStackTrace: $stackTrace");
-    }
+    debugPrint("[Error] $observedObject: $error\nStackTrace: $stackTrace");
   }
 }

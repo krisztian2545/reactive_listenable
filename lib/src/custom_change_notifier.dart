@@ -11,7 +11,7 @@ extension type ExposedChangeNotifier(ChangeNotifierCopy notifier) {
 }
 
 /// A copy of ChangeNotifier to access it's listeners.
-mixin class ChangeNotifierCopy implements Listenable {
+mixin class ChangeNotifierCopy implements ChangeNotifier {
   int _count = 0;
   // The _listeners is intentionally set to a fixed-length _GrowableList instead
   // of const [].
@@ -85,6 +85,7 @@ mixin class ChangeNotifierCopy implements Listenable {
   /// so, stopping that same work.
   ///
   /// This method returns false if [dispose] has been called.
+  @override
   @protected
   bool get hasListeners => _count > 0;
 
@@ -252,6 +253,7 @@ mixin class ChangeNotifierCopy implements Listenable {
   /// This method does not notify listeners, and clears the listener list once
   /// it is called. Consumers of this class must decide on whether to notify
   /// listeners or not immediately before disposal.
+  @override
   @mustCallSuper
   void dispose() {
     assert(ChangeNotifierCopy.debugAssertNotDisposed(this));
@@ -287,6 +289,7 @@ mixin class ChangeNotifierCopy implements Listenable {
   /// Surprising behavior can result when reentrantly removing a listener (e.g.
   /// in response to a notification) that has been registered multiple times.
   /// See the discussion at [removeListener].
+  @override
   @protected
   @visibleForTesting
   @pragma('vm:notify-debugger-on-exception')

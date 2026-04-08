@@ -81,13 +81,14 @@ class AsyncReactive<T> extends StateNotifier<AsyncState<T>> {
     set(AsyncLoading(), forceUpdate: _needsBuild);
     clearDependencies();
 
-    _compute(_watch)
-        .then((data) => value = AsyncData(data))
-        .catchError((Object err) {
-      final stack = StackTrace.current;
-      value = AsyncError(err, stack);
-      ReactiveListenableObserver.observer?.onError(this, err, stack);
-    });
+    _compute(_watch).then(
+      (data) => value = AsyncData(data),
+      onError: (Object err) {
+        final stack = StackTrace.current;
+        value = AsyncError(err, stack);
+        ReactiveListenableObserver.observer?.onError(this, err, stack);
+      },
+    );
 
     _needsBuild = false;
     return super.value;
@@ -103,11 +104,11 @@ class Effect with ListenableListenerMixin, ObservedDisposableMixin {
     FutureOr<void> Function(L Function<L extends Listenable>(L)) effect, {
     this.debugLabel,
   }) {
-    effect(_watch);
     this.effect = () async {
       clearDependencies();
       await effect(_watch);
     };
+    this.effect();
   }
 
   Effect.late(
